@@ -5,9 +5,13 @@
 package it.polito.tdp.PremierLeague;
 
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.PremierLeague.model.Model;
+import it.polito.tdp.PremierLeague.model.Team;
+import it.polito.tdp.PremierLeague.model.teamDifferenzaPunti;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -35,7 +39,7 @@ public class FXMLController {
     private Button btnSimula; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbSquadra"
-    private ComboBox<?> cmbSquadra; // Value injected by FXMLLoader
+    private ComboBox<Team> cmbSquadra; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtN"
     private TextField txtN; // Value injected by FXMLLoader
@@ -48,12 +52,35 @@ public class FXMLController {
 
     @FXML
     void doClassifica(ActionEvent event) {
-
+    	
+    	Team team= this.cmbSquadra.getValue(); 
+    	this.txtResult.appendText("\nSquadre migliori di "+team+": "); 
+    	
+    	List<teamDifferenzaPunti> listMgl= this.model.getTeamMIgliori(team);
+    	Collections.sort(listMgl);
+    	
+    	for(teamDifferenzaPunti tt: listMgl) {
+    		this.txtResult.appendText("\n"+tt); 
+    	}
+    	
+    	List<teamDifferenzaPunti> listPegg= this.model.getTeamPeggiori(team);
+    	Collections.sort(listPegg);
+    	
+        this.txtResult.appendText("\n\n\nSquadre peggiori di "+team+": "); 
+    	
+    	for(teamDifferenzaPunti tt: listPegg) {
+    		this.txtResult.appendText("\n"+tt); 
+    	}
+    	
+    	
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
 
+    	model.creaGrafo();
+    	this.cmbSquadra.getItems().addAll( model.getAllTeam());
+    	
     }
 
     @FXML

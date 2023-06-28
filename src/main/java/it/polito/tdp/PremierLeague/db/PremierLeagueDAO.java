@@ -41,6 +41,7 @@ public class PremierLeagueDAO {
 		List<Team> result = new ArrayList<Team>();
 		Connection conn = DBConnect.getConnection();
 
+	
 		try {
 			PreparedStatement st = conn.prepareStatement(sql);
 			ResultSet res = st.executeQuery();
@@ -84,9 +85,12 @@ public class PremierLeagueDAO {
 	}
 	
 	public List<Match> listAllMatches(){
+		
 		String sql = "SELECT m.MatchID, m.TeamHomeID, m.TeamAwayID, m.teamHomeFormation, m.teamAwayFormation, m.resultOfTeamHome, m.date, t1.Name, t2.Name   "
 				+ "FROM Matches m, Teams t1, Teams t2 "
-				+ "WHERE m.TeamHomeID = t1.TeamID AND m.TeamAwayID = t2.TeamID";
+				+ "WHERE m.TeamHomeID = t1.TeamID AND m.TeamAwayID = t2.TeamID"
+				+" order by date asc ";
+		
 		List<Match> result = new ArrayList<Match>();
 		Connection conn = DBConnect.getConnection();
 
@@ -110,6 +114,92 @@ public class PremierLeagueDAO {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	public Integer getPunteggioCasa(Team t1) {
+		//all result di una squadra
+		
+		String sql = "select m.ResultOfTeamHome "
+				+ "from Matches m "
+				+ "where m.TeamHomeID= ? " ; 
+		
+		List<Integer> result = new ArrayList<>();
+		int resultFinal = 0; 
+
+		
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, t1.getTeamID());
+			ResultSet res = st.executeQuery();
+			
+			while (res.next()) {
+             
+				result.add(res.getInt("m.ResultOfTeamHome"));
+			}
+			
+			for(Integer ii: result) {
+				
+				if(ii==1) {
+					resultFinal+=3;
+				}
+				if(ii==0) {
+					resultFinal+=1;
+				}
+			}  
+			conn.close();
+			return resultFinal;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	
+	}
+	
+	public Integer getPunteggioFuoriCasa(Team t1) {
+		//all result di una squadra
+		
+		String sql = "select m.ResultOfTeamHome "
+				+ "from Matches m "
+				+ "where m.TeamAwayID= ? " ; 
+		
+		List<Integer> result = new ArrayList<>();
+		int resultFinal = 0; 
+
+		
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, t1.getTeamID());
+			ResultSet res = st.executeQuery();
+			
+			while (res.next()) {
+             
+				result.add(res.getInt("m.ResultOfTeamHome"));
+			}
+			
+			for(Integer ii: result) {
+				
+				//  a punteggi invertiti ...
+				
+				if(ii==-1) {
+					resultFinal+=3;
+				}
+				if(ii==0) {
+					resultFinal+=1;
+				}
+			}  
+			conn.close();
+			return resultFinal;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	
 	}
 	
 }
